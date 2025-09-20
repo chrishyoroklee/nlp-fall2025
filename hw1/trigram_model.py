@@ -34,10 +34,25 @@ def get_ngrams(sequence, n):
     COMPLETE THIS FUNCTION (PART 1)
     Given a sequence, this function should return a list of n-grams, where each n-gram is a Python tuple.
     This should work for arbitrary values of n >= 1 
+
+    tuple size is n
     """
+    if n < 1 or not sequence:
+        return []
+    if n > 1:
+        padded_sequence = ['START'] * (n - 1) + sequence + ['STOP']
+    elif n == 1:
+        padded_sequence = sequence 
 
-    return []
-
+    length = len(padded_sequence)
+    res = []
+    l, r = 0, n
+    while r <= length:
+        res.append(tuple(padded_sequence[l:r]))
+        l += 1
+        r += 1
+     
+    return res
 
 class TrigramModel(object):
     
@@ -128,27 +143,27 @@ class TrigramModel(object):
         return float("inf") 
 
 
-def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2):
+# def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2):
 
-        model1 = TrigramModel(training_file1)
-        model2 = TrigramModel(training_file2)
+#         model1 = TrigramModel(training_file1)
+#         model2 = TrigramModel(training_file2)
 
-        total = 0
-        correct = 0       
+#         total = 0
+#         correct = 0       
  
-        for f in os.listdir(testdir1):
-            pp1 = model1.perplexity(corpus_reader(os.path.join(testdir1, f), model1.lexicon))
-            pp2 = model2.perplexity(corpus_reader(os.path.join(testdir1, f), model2.lexicon))
-            # .. 
+#         for f in os.listdir(testdir1):
+#             pp1 = model1.perplexity(corpus_reader(os.path.join(testdir1, f), model1.lexicon))
+#             pp2 = model2.perplexity(corpus_reader(os.path.join(testdir1, f), model2.lexicon))
+#             # .. 
     
-        for f in os.listdir(testdir2):
-            # .. 
+#         for f in os.listdir(testdir2):
+#             # .. 
         
-        return 0.0
+#         return 0.0
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    model = TrigramModel(sys.argv[1]) 
+#     model = TrigramModel(sys.argv[1]) 
 
     # put test code here...
     # or run the script from the command line with 
