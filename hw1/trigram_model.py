@@ -39,8 +39,10 @@ def get_ngrams(sequence, n):
     """
     if n < 1 or not sequence:
         return []
+    #unigram case - do not include STOP marker
     if n > 1:
         padded_sequence = ['START'] * (n - 1) + sequence + ['STOP']
+    #all the other ngram cases
     elif n == 1:
         padded_sequence = sequence 
 
@@ -77,12 +79,22 @@ class TrigramModel(object):
         and trigram counts. 
         """
    
-        self.unigramcounts = {} # might want to use defaultdict or Counter instead
-        self.bigramcounts = {} 
-        self.trigramcounts = {} 
+        self.unigramcounts = defaultdict(int) 
+        self.bigramcounts = defaultdict(int)
+        self.trigramcounts = defaultdict(int)
 
-        ##Your code here
-
+        #Generate 3 separate ngrams
+        for sentence in corpus:
+            unigram = get_ngrams(sentence, 1)
+            bigram = get_ngrams(sentence, 2)
+            trigram = get_ngrams(sentence, 3)
+        
+            for gram in unigram:
+                self.unigramcounts[gram] += 1
+            for gram in bigram:
+                self.bigramcounts[gram] += 1
+            for gram in trigram:
+                self.trigramcounts[gram] += 1
         return
 
     def raw_trigram_probability(self,trigram):
@@ -161,9 +173,9 @@ class TrigramModel(object):
         
 #         return 0.0
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
 
-#     model = TrigramModel(sys.argv[1]) 
+    model = TrigramModel(sys.argv[1]) 
 
     # put test code here...
     # or run the script from the command line with 
