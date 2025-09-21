@@ -153,11 +153,17 @@ class TrigramModel(object):
         lambda2 = 1/3.0
         lambda3 = 1/3.0
         u, v, w = trigram
-        return (
+
+        smoothed_probability = (
             lambda1 * self.raw_trigram_probability((u, v, w)) + 
             lambda2 * self.raw_bigram_probability((v, w)) + 
             lambda3 * self.raw_unigram_probability((w,))
         )
+
+        if smoothed_probability <= 0: 
+            smoothed_probability = 0.00000000001 #avoid 0 at all times
+
+        return smoothed_probability
         
     def sentence_logprob(self, sentence):
         """
@@ -188,23 +194,29 @@ class TrigramModel(object):
         return pow(2, -total_sum / M)
 
 
-# def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2):
+def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2):
 
-#         model1 = TrigramModel(training_file1)
-#         model2 = TrigramModel(training_file2)
+        model1 = TrigramModel(training_file1)
+        model2 = TrigramModel(training_file2)
 
-#         total = 0
-#         correct = 0       
+        total = 0
+        correct = 0       
  
-#         for f in os.listdir(testdir1):
-#             pp1 = model1.perplexity(corpus_reader(os.path.join(testdir1, f), model1.lexicon))
-#             pp2 = model2.perplexity(corpus_reader(os.path.join(testdir1, f), model2.lexicon))
-#             # .. 
+        for f in os.listdir(testdir1):
+            pp1 = model1.perplexity(corpus_reader(os.path.join(testdir1, f), model1.lexicon))
+            pp2 = model2.perplexity(corpus_reader(os.path.join(testdir1, f), model2.lexicon))
+            
+            if pp1 < pp2: correct += 1
+            total += 1
     
-#         for f in os.listdir(testdir2):
-#             # .. 
+        for f in os.listdir(testdir2):
+            pp1 = model1.perplexity(corpus_reader(os.path.join(testdir2, f), model1.lexicon))
+            pp2 = model2.perplexity(corpus_reader(os.path.join(testdir2, f), model2.lexicon))
+            
+            if pp2 < pp1: correct += 1
+            total += 1
         
-#         return 0.0
+        return correct / total
 
 if __name__ == "__main__":
 
@@ -220,11 +232,12 @@ if __name__ == "__main__":
 
     
     # Testing perplexity: 
-    dev_corpus = corpus_reader(sys.argv[2], model.lexicon)
-    pp = model.perplexity(dev_corpus)
-    print(pp)
+    # dev_corpus = corpus_reader(sys.argv[2], model.lexicon)
+    # pp = model.perplexity(dev_corpus)
+    # print(pp)
 
     # Essay scoring experiment: 
     # acc = essay_scoring_experiment('train_high.txt', 'train_low.txt", "test_high", "test_low")
-    # print(acc)
+    acc = essay_scoring_experiment('./ets_toefl_data/train_high.txt', './ets_toefl_data/train_low.txt', './ets_toefl_data/test_high', './ets_toefl_data/test_low')
+    print(acc)
 
