@@ -164,7 +164,11 @@ class TrigramModel(object):
         COMPLETE THIS METHOD (PART 5)
         Returns the log probability of an entire sequence.
         """
-        return float("-inf")
+        all_trigrams = get_ngrams(sentence, 3)
+        res = 0
+        for trigram in all_trigrams:
+            res += math.log2(self.smoothed_trigram_probability(trigram))
+        return res
 
     def perplexity(self, corpus):
         """
