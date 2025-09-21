@@ -175,7 +175,17 @@ class TrigramModel(object):
         COMPLETE THIS METHOD (PART 6) 
         Returns the log probability of an entire sequence.
         """
-        return float("inf") 
+        M = 0
+        total_sum = 0.0
+
+        for sentence in corpus:
+            total_sum += self.sentence_logprob(sentence)
+            M += len(sentence) + 1
+
+        if M == 0: 
+            return float('inf')
+
+        return pow(2, -total_sum / M)
 
 
 # def essay_scoring_experiment(training_file1, training_file2, testdir1, testdir2):
@@ -210,10 +220,9 @@ if __name__ == "__main__":
 
     
     # Testing perplexity: 
-    # dev_corpus = corpus_reader(sys.argv[2], model.lexicon)
-    # pp = model.perplexity(dev_corpus)
-    # print(pp)
-
+    dev_corpus = corpus_reader(sys.argv[2], model.lexicon)
+    pp = model.perplexity(dev_corpus)
+    print(pp)
 
     # Essay scoring experiment: 
     # acc = essay_scoring_experiment('train_high.txt', 'train_low.txt", "test_high", "test_low")
