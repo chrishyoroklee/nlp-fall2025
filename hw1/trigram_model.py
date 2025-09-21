@@ -95,6 +95,9 @@ class TrigramModel(object):
                 self.bigramcounts[gram] += 1
             for gram in trigram:
                 self.trigramcounts[gram] += 1
+
+        #store total_unigrams for future use
+        self.total_unigrams = sum(self.unigramcounts.values())
         return
 
     def raw_trigram_probability(self,trigram):
@@ -102,25 +105,36 @@ class TrigramModel(object):
         COMPLETE THIS METHOD (PART 3)
         Returns the raw (unsmoothed) trigram probability
         """
-        return 0.0
+        u, v, w = trigram
+        trigram_count = self.trigramcounts[(u, v, w)]
+        bigram_count = self.bigramcounts[(u, v)]
+
+        if bigram_count == 0: 
+            return 1 / len(self.lexicon)
+        return trigram_count / bigram_count
 
     def raw_bigram_probability(self, bigram):
         """
         COMPLETE THIS METHOD (PART 3)
         Returns the raw (unsmoothed) bigram probability
         """
-        return 0.0
+        u, v = bigram
+        bigram_count = self.bigramcounts[(u, v)]
+        unigram_count = self.unigramcounts[(u,)]
+        if unigram_count == 0:
+            return 1 / len(self.lexicon)
+        return bigram_count / unigram_count
     
     def raw_unigram_probability(self, unigram):
         """
         COMPLETE THIS METHOD (PART 3)
         Returns the raw (unsmoothed) unigram probability.
         """
-
-        #hint: recomputing the denominator every time the method is called
-        # can be slow! You might want to compute the total number of words once, 
-        # store in the TrigramModel instance, and then re-use it.  
-        return 0.0
+        unigram_count = self.unigramcounts[unigram]
+        total = self.total_unigrams
+        if total == 0:
+            return 1 / len(self.lexicon)
+        return unigram_count / total
 
     def generate_sentence(self,t=20): 
         """
