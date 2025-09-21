@@ -152,7 +152,12 @@ class TrigramModel(object):
         lambda1 = 1/3.0
         lambda2 = 1/3.0
         lambda3 = 1/3.0
-        return 0.0
+        u, v, w = trigram
+        return (
+            lambda1 * self.raw_trigram_probability((u, v, w)) + 
+            lambda2 * self.raw_bigram_probability((v, w)) + 
+            lambda3 * self.raw_unigram_probability((w,))
+        )
         
     def sentence_logprob(self, sentence):
         """
