@@ -3,6 +3,7 @@ from collections import defaultdict
 import copy
 import sys
 import numpy as np
+import io #for temp testing
 
 class State(object):
     def __init__(self, sentence = []):
@@ -113,7 +114,40 @@ class FeatureExtractor(object):
 
     def get_input_representation(self, words, pos, state):
         # TODO: Write this method for Part 2
-        return np.zeros(6)
+        stack_ids, buffer_ids= [], []
+        for i in range(1, 4):
+            if len(state.stack) >= i:
+                stack_ids.append(state.stack[-i])
+            else:
+                stack_ids.append(None)
+
+            if len(state.buffer) >= i:
+                buffer_ids.append(state.buffer[-i])
+            else:
+                buffer_ids.append(None)
+        combined_ids = stack_ids + buffer_ids
+
+        index_output = []
+        for id in combined_ids:
+            if id is None:
+                index_output.append(self.word_vocab["<NULL>"])
+            elif id == 0:
+                index_output.append(self.word_vocab["<ROOT>"])
+            else:
+                word = words[id - 1]
+                pos_tag = pos[id - 1]
+
+                if word in self.word_vocab:
+                    index_output.append(self.word_vocab[word])
+                elif pos_tag == "CD":
+                    index_output.append(self.word_vocab["<CD>"])
+                elif pos_tag == "NNP":
+                    index_output.append(self.word_vocab["<NNP>"])
+                #unknowncases
+                else:
+                    index_output.append(self.word_vocab["<UNK>"])
+
+        return np.array(index_output)
 
     def get_output_representation(self, output_pair):  
         # TODO: Write this method for Part 2
@@ -137,27 +171,54 @@ def get_training_matrices(extractor, in_file):
         count += 1
     sys.stdout.write("\n")
     return np.vstack(inputs),np.vstack(outputs)
-       
 
 
-if __name__ == "__main__":
+#TEMPORARY TESTING ZONE
+words = ["The", "dog", "eats", "a", "bone"]
+pos = ["DT", "NN", "VB", "DT", "NN"]
 
-    WORD_VOCAB_FILE = 'data/words.vocab'
+# Mock vocab
 
-    try:
-        word_vocab_f = open(WORD_VOCAB_FILE,'r')
-    except FileNotFoundError:
-        print("Could not find vocabulary file {}".format(WORD_VOCAB_FILE))
-        sys.exit(1) 
+vocab_text = """<ROOT> 1
+<NULL> 2
+<CD> 3
+<NNP> 4
+<UNK> 5
+The 10
+dog 11
+eats 12
+a 13
+bone 14
+"""
+
+# Mock state
+state = State([1,2,3,4,5])
+state.stack = [0,1]  # ROOT + "The"
+state.buffer = [2,3,4,5]  # remaining words
+
+vocab_file = io.StringIO(vocab_text)
+fe = FeatureExtractor(vocab_file)
+x = fe.get_input_representation(words, pos, state)
+print(x)
+
+# if __name__ == "__main__":
+
+#     WORD_VOCAB_FILE = 'data/words.vocab'
+
+#     try:
+#         word_vocab_f = open(WORD_VOCAB_FILE,'r')
+#     except FileNotFoundError:
+#         print("Could not find vocabulary file {}".format(WORD_VOCAB_FILE))
+#         sys.exit(1) 
 
 
-    with open(sys.argv[1],'r') as in_file:   
+#     with open(sys.argv[1],'r') as in_file:   
 
-        extractor = FeatureExtractor(word_vocab_f)
-        print("Starting feature extraction... (each . represents 100 sentences)")
-        inputs, outputs = get_training_matrices(extractor,in_file)
-        print("Writing output...")
-        np.save(sys.argv[2], inputs)
-        np.save(sys.argv[3], outputs)
+#         extractor = FeatureExtractor(word_vocab_f)
+#         print("Starting feature extraction... (each . represents 100 sentences)")
+#         inputs, outputs = get_training_matrices(extractor,in_file)
+#         print("Writing output...")
+#         np.save(sys.argv[2], inputs)
+#         np.save(sys.argv[3], outputs)
 
 
