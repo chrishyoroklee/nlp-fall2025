@@ -8,6 +8,8 @@ import os.path
 COMS W4705 - Natural Language Processing - Fall 2025 
 Programming Homework 1 - Trigram Language Models
 Daniel Bauer
+
+HW Completed By Chris Hyorok Lee (hl3838)
 """
 
 def corpus_reader(corpusfile, lexicon=None): 
