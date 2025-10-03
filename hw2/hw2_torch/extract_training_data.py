@@ -3,7 +3,6 @@ from collections import defaultdict
 import copy
 import sys
 import numpy as np
-import io #for temp testing
 
 class State(object):
     def __init__(self, sentence = []):
@@ -151,7 +150,15 @@ class FeatureExtractor(object):
 
     def get_output_representation(self, output_pair):  
         # TODO: Write this method for Part 2
-        return np.zeros(91)
+        #91 possible transitions 45*2 + 1
+        one_hot = np.zeros(len(self.output_labels))
+        idx = -1
+        if output_pair in self.output_labels:
+            idx = self.output_labels[output_pair]
+        if idx == -1:
+            raise ValueError(f"get output failed - unknown pair: {output_pair}")
+        one_hot[idx] = 1
+        return one_hot
 
      
     
@@ -173,52 +180,24 @@ def get_training_matrices(extractor, in_file):
     return np.vstack(inputs),np.vstack(outputs)
 
 
-#TEMPORARY TESTING ZONE
-words = ["The", "dog", "eats", "a", "bone"]
-pos = ["DT", "NN", "VB", "DT", "NN"]
+if __name__ == "__main__":
 
-# Mock vocab
+    WORD_VOCAB_FILE = 'data/words.vocab'
 
-vocab_text = """<ROOT> 1
-<NULL> 2
-<CD> 3
-<NNP> 4
-<UNK> 5
-The 10
-dog 11
-eats 12
-a 13
-bone 14
-"""
-
-# Mock state
-state = State([1,2,3,4,5])
-state.stack = [0,1]  # ROOT + "The"
-state.buffer = [2,3,4,5]  # remaining words
-
-vocab_file = io.StringIO(vocab_text)
-fe = FeatureExtractor(vocab_file)
-x = fe.get_input_representation(words, pos, state)
-print(x)
-
-# if __name__ == "__main__":
-
-#     WORD_VOCAB_FILE = 'data/words.vocab'
-
-#     try:
-#         word_vocab_f = open(WORD_VOCAB_FILE,'r')
-#     except FileNotFoundError:
-#         print("Could not find vocabulary file {}".format(WORD_VOCAB_FILE))
-#         sys.exit(1) 
+    try:
+        word_vocab_f = open(WORD_VOCAB_FILE,'r')
+    except FileNotFoundError:
+        print("Could not find vocabulary file {}".format(WORD_VOCAB_FILE))
+        sys.exit(1) 
 
 
-#     with open(sys.argv[1],'r') as in_file:   
+    with open(sys.argv[1],'r') as in_file:   
 
-#         extractor = FeatureExtractor(word_vocab_f)
-#         print("Starting feature extraction... (each . represents 100 sentences)")
-#         inputs, outputs = get_training_matrices(extractor,in_file)
-#         print("Writing output...")
-#         np.save(sys.argv[2], inputs)
-#         np.save(sys.argv[3], outputs)
+        extractor = FeatureExtractor(word_vocab_f)
+        print("Starting feature extraction... (each . represents 100 sentences)")
+        inputs, outputs = get_training_matrices(extractor,in_file)
+        print("Writing output...")
+        np.save(sys.argv[2], inputs)
+        np.save(sys.argv[3], outputs)
 
 

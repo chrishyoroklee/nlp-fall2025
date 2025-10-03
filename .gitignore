@@ -1,3 +1,7 @@
 hw2/.DS_Store
 hw2/hw2_torch.zip
 .DS_Store
+hw2/hw2_torch/data/input_dev.npy
+hw2/hw2_torch/data/input_train.npy
+hw2/hw2_torch/data/target_dev.npy
+hw2/hw2_torch/data/target_train.npy
