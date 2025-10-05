@@ -10,7 +10,7 @@ from extract_training_data import FeatureExtractor
 
 class DependencyDataset(Dataset):
 
-  def __init__(self, inputs_filename, output_filename):
+  def __init__(self, input_filename, output_filename):
     self.inputs = np.load(input_filename)
     self.outputs = np.load(output_filename)
 
@@ -26,8 +26,16 @@ class DependencyModel(Module):
   def __init__(self, word_types, outputs):
     super(DependencyModel, self).__init__()
     # TODO: complete for part 3
+    self.embedding = torch.nn.Embedding(num_embeddings=len(word_types), embedding_dim=128)
+    self.hidden = torch.nn.Linear((6 * 128), 128)
+    self.output = torch.nn.Linear(128, outputs)
 
   def forward(self, inputs):
+    x = self.embedding(inputs)
+    x = x.view(x.shape[0], -1) #flatten 3D to 2D
+    x = torch.nn.functional.relu(self.hidden(x))
+    x = self.output(x)
+    return x
 
     # TODO: complete for part 3
     return torch.zeros(inputs.shape(0), 91)  # replace this line
