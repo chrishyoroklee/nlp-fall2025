@@ -28,7 +28,7 @@ class Parser(object):
 
         # TODO: Write the body of this loop for part 5
         while state.buffer:
-          pass # replace
+            features = self.extractor.get_input_representation(words, pos, state)
 
 
   
