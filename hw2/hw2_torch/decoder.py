@@ -29,9 +29,34 @@ class Parser(object):
         # TODO: Write the body of this loop for part 5
         while state.buffer:
             features = self.extractor.get_input_representation(words, pos, state)
+            features = torch.tensor(features).unsqueeze(0)
 
+            with torch.no_grad():
+                probability = torch.softmax(self.model(features), dim=1).numpy()[0]
 
-  
+            #sort the indexes while changing the scores
+            sorted_idx =  sorted(range(len(probability)), key=lambda i: probability[i], reverse=True)
+
+            for idx in sorted_idx:
+                action, label = self.output_labels[idx]
+                
+                if action == "shift":
+                    if len(state.buffer) == 0:
+                        continue
+                    if len(state.buffer) == 1 and len(state.stack) > 1:
+                        continue
+                    state.shift()
+                    break
+                elif state == "left_arc":
+                    if len(state.buffer) == 0 or state.stack[-1] == 0:
+                        continue
+                    state.left_arc(label)
+                    break
+                elif state == "right_arc":
+                    if len(state.stack) == 0:
+                        continue
+                    state.right_arc(label)
+                    break
 
         result = DependencyStructure()
         for p,c,r in state.deps:
