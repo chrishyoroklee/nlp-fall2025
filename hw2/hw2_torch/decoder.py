@@ -43,16 +43,16 @@ class Parser(object):
                 if action == "shift":
                     if len(state.buffer) == 0:
                         continue
-                    if len(state.buffer) == 1 and len(state.stack) > 1:
+                    if len(state.buffer) == 1 and len(state.stack) >= 1:
                         continue
                     state.shift()
                     break
-                elif state == "left_arc":
-                    if len(state.buffer) == 0 or state.stack[-1] == 0:
+                elif action == "left_arc":
+                    if len(state.stack) == 0 or state.stack[-1] == 0:
                         continue
                     state.left_arc(label)
                     break
-                elif state == "right_arc":
+                elif action == "right_arc":
                     if len(state.stack) == 0:
                         continue
                     state.right_arc(label)

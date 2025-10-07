@@ -133,8 +133,8 @@ class FeatureExtractor(object):
             elif id == 0:
                 index_output.append(self.word_vocab["<ROOT>"])
             else:
-                word = words[id - 1]
-                pos_tag = pos[id - 1]
+                word = words[id]
+                pos_tag = pos[id]
 
                 if word in self.word_vocab:
                     index_output.append(self.word_vocab[word])
